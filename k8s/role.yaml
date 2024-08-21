@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nodemetric-controller-role
+rules:
+- apiGroups: ["raf.rs"]
+  resources: ["nodemetrics"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nodemetric-controller-binding
+subjects:
+- kind: ServiceAccount
+  name: default  # Or the specific service account name you created earlier
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: nodemetric-controller-role
+  apiGroup: rbac.authorization.k8s.io
