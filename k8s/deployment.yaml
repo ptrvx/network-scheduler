@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: nodemetric-controller
-          image: ptrvx/network-scheduler
+          image: ptrvx/network-collector
           imagePullPolicy: Always
           env:
             - name: POD_NAMESPACE

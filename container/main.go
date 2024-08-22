@@ -18,6 +18,10 @@ import (
 )
 
 func main() {
+
+}
+
+func updateMetric() {
 	_, dynamicClient, err := getKubernetesClient()
 	if err != nil {
 		log.Fatalf("failed to create k8s client: %v", err)
