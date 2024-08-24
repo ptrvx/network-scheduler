@@ -18,7 +18,7 @@ import (
 )
 
 func main() {
-
+	updateMetric()
 }
 
 func updateMetric() {

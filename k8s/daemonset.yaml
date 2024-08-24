@@ -16,6 +16,7 @@ spec:
       containers:
       - name: nodemetric-collector
         image: ptrvx/network-collector:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5201  # iperf3 port
         env:
