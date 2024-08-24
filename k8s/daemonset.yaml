@@ -12,10 +12,11 @@ spec:
       labels:
         app: nodemetric-collector
     spec:
+      hostNetwork: true
       # serviceAccountName: metrics-collector
       containers:
       - name: nodemetric-collector
-        image: ptrvx/network-collector:latest
+        image: ptrvx/network-collector:dev
         imagePullPolicy: Always
         ports:
         - containerPort: 5201  # iperf3 port

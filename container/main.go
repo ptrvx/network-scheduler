@@ -4,21 +4,29 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
-
-	"github.com/BGrewell/go-iperf"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 )
 
 func main() {
-	updateMetric()
+	go server()
+
+	clientset, _, err := getKubernetesClient()
+	if err != nil {
+		log.Fatal("failed to get k8s client", err)
+	}
+	nodeIPs, err := getNodeIPs(context.TODO(), clientset)
+	if err != nil {
+		log.Fatal("failed to get node IPs", err)
+	}
+	log.Printf("Node IPs: %v", nodeIPs)
+
+	for _, node := range nodeIPs {
+		client(node)
+	}
 }
 
 func updateMetric() {
@@ -85,41 +93,4 @@ func updateMetric() {
 	fmt.Printf("Updated NodeMetric %v successfully!\n", nodeMetricName)
 	fmt.Printf("Updated NodeMetric: %v\n", updated.Object)
 
-}
-
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, World!")
-}
-
-func server() {
-	s := iperf.NewServer()
-	s.SetPort(5201)
-	err := s.Start()
-	if err != nil {
-		fmt.Println("Failed to start server:", err)
-		return
-	}
-	defer s.Stop()
-	fmt.Println("Server is running...")
-
-	http.HandleFunc("/", helloHandler)
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		panic(err)
-	}
-}
-
-func getKubernetesClient() (*kubernetes.Clientset, dynamic.Interface, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, nil, err
-	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, nil, err
-	}
-	dynamicClient, err := dynamic.NewForConfig(config)
-	if err != nil {
-		return nil, nil, err
-	}
-	return clientset, dynamicClient, nil
 }

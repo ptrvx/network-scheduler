@@ -3,6 +3,9 @@ kind: ClusterRole
 metadata:
   name: nodemetric-controller-role
 rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
 - apiGroups: ["raf.rs"]
   resources: ["nodemetrics"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]

@@ -28,7 +28,14 @@ spec:
                         type: string
                       latency:
                         type: string
-  scope: Cluster
+            status:
+              type: object
+              properties:
+                lastUpdated:
+                  type: string
+      subresources:
+        status: {}
+  scope: Namespaced
   names:
     plural: nodemetrics
     singular: nodemetric
