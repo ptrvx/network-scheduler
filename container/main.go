@@ -14,7 +14,10 @@ import (
 	"k8s.io/client-go/dynamic"
 )
 
-var Namespace = os.Getenv("METRICS_NAMESPACE")
+var (
+	Namespace = os.Getenv("POD_NAMESPACE")
+	NodeName  = os.Getenv("NODE_NAME")
+)
 
 func main() {
 	ctx := context.Background()
@@ -29,9 +32,13 @@ func main() {
 	if Namespace == "" {
 		Namespace = "default"
 	}
+	if NodeName == "" {
+		log.Printf("failed to read NODE_NAME variable")
+		os.Exit(1)
+	}
 
 	updater := &Updater{
-		selfNode: "TODO",
+		selfNode: NodeName,
 		client:   dynamicClient,
 		gvr: schema.GroupVersionResource{
 			Group:    "raf.rs",
