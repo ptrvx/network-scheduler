@@ -20,4 +20,6 @@ WORKDIR /root/
 
 COPY --from=builder /app/nodemetric-controller .
 
+EXPOSE 5201
+
 ENTRYPOINT ["./nodemetric-controller"]
