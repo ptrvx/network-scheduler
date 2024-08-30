@@ -2,6 +2,10 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: test-pod
+  annotations:
+    upload.raf.rs: "100000000"   # Upload threshold in bits per second (e.g., 100 Mbps)
+    download.raf.rs: "100000000" # Download threshold in bits per second (e.g., 100 Mbps)
+    latency.raf.rs: "50000"      # Latency threshold in microseconds (e.g., 50ms)
 spec:
   schedulerName: raf-scheduler  # Use the name of your custom scheduler
   containers:
