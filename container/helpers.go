@@ -21,7 +21,7 @@ const (
 )
 
 type Metric struct {
-	Latency   int64
+	Latency   float64
 	Bandwidth Bandwidth
 }
 type Bandwidth struct {

@@ -14,6 +14,10 @@ import (
 	"k8s.io/client-go/dynamic"
 )
 
+const (
+	alpha = 0.4
+)
+
 var (
 	Namespace = os.Getenv("POD_NAMESPACE")
 	NodeName  = os.Getenv("NODE_NAME")
@@ -87,7 +91,6 @@ type Updater struct {
 }
 
 func (u *Updater) updateMetric(ctx context.Context, node string, metric Metric) error {
-
 	nodeMetric, err := u.client.Resource(u.gvr).Namespace(u.namespace).Get(ctx, u.selfNode, metav1.GetOptions{})
 	if errors.IsNotFound(err) {
 		nodeMetric = &unstructured.Unstructured{
@@ -117,6 +120,25 @@ func (u *Updater) updateMetric(ctx context.Context, node string, metric Metric) 
 	}
 	if !found || metrics == nil {
 		metrics = make(map[string]interface{})
+	}
+
+	valuesRaw, ok := metrics[node]
+	if ok {
+		values, ok := valuesRaw.(map[string]interface{})
+		if ok {
+			upload, uploadOk := values["upload"].(float64)
+			if uploadOk {
+				metric.Bandwidth.Upload = metric.Bandwidth.Upload*alpha + (1-alpha)*upload
+			}
+			download, downloadOk := values["download"].(float64)
+			if downloadOk {
+				metric.Bandwidth.Download = metric.Bandwidth.Download*alpha + (1-alpha)*download
+			}
+			latency, latencyOk := values["latency"].(float64)
+			if latencyOk {
+				metric.Latency = metric.Latency*alpha + (1-alpha)*latency
+			}
+		}
 	}
 
 	metrics[node] = map[string]interface{}{
@@ -150,5 +172,5 @@ func measureNodeMetrics(node string) (Metric, error) {
 		log.Printf("failed to measure bandwidth to node %v: %v", node, err)
 		return Metric{}, fmt.Errorf("failed to measrue bandwidth to node %v: %w", node, err)
 	}
-	return Metric{Latency: latency.Microseconds(), Bandwidth: bandwidth}, nil
+	return Metric{Latency: float64(latency.Microseconds()), Bandwidth: bandwidth}, nil
 }
